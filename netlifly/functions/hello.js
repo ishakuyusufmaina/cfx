@@ -2,8 +2,8 @@ const axios = require('axios');
 
 exports.handler = async function(event, context) {
   //const reference = event.queryStringParameters.reference;
-const data = JSON.parse(event.body);  // Parse JSON payload
-const reference = data.reference;     // Access the "reference" field
+const bodyData = JSON.parse(event.body);  // Parse JSON payload
+const reference = bodyData.reference;     // Access the "reference" field
   
   if (!reference) {
     return {
