@@ -13,7 +13,7 @@ exports.handler = async function(event, context) {
   try {
     const res = await axios.get(`https://api.paystack.co/transaction/verify/${reference}`, {
       headers: {
-        Authorization: `Bearer sk_test_xxxxxxxxxxxxxxxxxxxxxx` // your secret key
+        Authorization: `Bearer sk_live_10dfe269ce4fa26d99590a6b0af454adc07577c3` // your secret key
       }
     });
 
