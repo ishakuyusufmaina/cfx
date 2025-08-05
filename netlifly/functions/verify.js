@@ -3,7 +3,7 @@ const admin = require("firebase-admin");
 let initialized = false;
 
 exports.handler = async function(event, context) {
-  return 455667777;
+  
   if (!initialized) {
     const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
 
