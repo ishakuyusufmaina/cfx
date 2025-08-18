@@ -1,93 +1,72 @@
-const fetch = require("node-fetch");
+const axios = require('axios');
 
-export default async function handler(event, context) {
+exports.handler = async (event) => {
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      body: 'Method Not Allowed',
+    };
+  }
+
   try {
-    if (event.httpMethod !== "POST") {
-      return {
-        statusCode: 405,
-        body: JSON.stringify({ error: "Only POST allowed" })
-      };
-    }
+    const { sourceURL, repoName, private: isPrivate = false, description = '' } = JSON.parse(event.body);
 
-    const { sourceURL, repoName } = JSON.parse(event.body || "{}");
-
-    if (!sourceURL || !repoName) {
+    if (!repoName || !sourceURL) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "sourceURL and repoName required" })
+        body: JSON.stringify({ error: 'repoName and sourceURL are required' }),
       };
     }
 
-    const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-    const GITHUB_USER = "ishakuyusufmaina"; // or process.env.GITHUB_USER
+    const token = process.env.GITHUB_TOKEN;
+    const user ="ishakuyusufmaina"; //process.env.GITHUB_USER;
 
-    if (!GITHUB_TOKEN || !GITHUB_USER) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: "GitHub credentials not configured" })
-      };
-    }
-
-    // 1. Create GitHub repository
-    const createRepoResp = await fetch("https://api.github.com/user/repos", {
-      method: "POST",
-      headers: {
-        "Authorization": `token ${GITHUB_TOKEN}`,
-        "Accept": "application/vnd.github+json`
-      },
-      body: JSON.stringify({
-        name: repoName,
-        private: false
-      })
-    });
-
-    if (!createRepoResp.ok) {
-      const errText = await createRepoResp.text();
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: "Failed to create repo", details: errText })
-      };
-    }
-
-    // 2. Trigger GitHub Import
-    const importResp = await fetch(
-      `https://api.github.com/repos/${GITHUB_USER}/${repoName}/import`,
+    // 1. Create repo
+    const createResp = await axios.post(
+      'https://api.github.com/user/repos',
       {
-        method: "PUT",
+        name: repoName,
+        private: isPrivate,
+        description,
+      },
+      {
         headers: {
-          "Authorization": `token ${GITHUB_TOKEN}`,
-          "Accept": "application/vnd.github+json`
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/vnd.github.v3+json',
         },
-        body: JSON.stringify({
-          vcs: "git",
-          vcs_url: sourceURL
-        })
       }
     );
 
-    if (!importResp.ok) {
-      const errText = await importResp.text();
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: "Import failed", details: errText })
-      };
-    }
-
-    const importData = await importResp.json();
+    // 2. Trigger import
+    const importResp = await axios.put(
+      `https://api.github.com/repos/${user}/${repoName}/import`,
+      {
+        vcs: 'git',
+        vcs_url: sourceURL,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+      }
+    );
 
     return {
       statusCode: 200,
       body: JSON.stringify({
-        success: true,
-        message: "Repo created and import started",
-        importStatus: importData
-      })
+        message: 'Repository created and import started',
+        repo: createResp.data.html_url,
+        importStatus: importResp.data,
+      }),
     };
-
-  } catch (err) {
+  } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message })
+      body: JSON.stringify({
+        error: error.response?.data?.message || error.message,
+        details: error.response?.data,
+      }),
     };
   }
-}
+};
