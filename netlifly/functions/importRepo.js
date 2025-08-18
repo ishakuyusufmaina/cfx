@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     }
 
     const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-    const GITHUB_USER = process.env.GITHUB_USER; // set this in Netlify env vars
+    const GITHUB_USER = "ishakuyusufmaina"; //process.env.GITHUB_USER; // set this in Netlify env vars
 
     if (!GITHUB_TOKEN || !GITHUB_USER) {
       return res.status(500).json({ error: "GitHub credentials not configured" });
