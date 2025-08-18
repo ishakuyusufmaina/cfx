@@ -1,23 +1,31 @@
-// netlify/functions/importRepo.js
 const fetch = require("node-fetch");
 
-export default async function handler(req, res) {
+export default async function handler(event, context) {
   try {
-    if (req.method !== "POST") {
-      return res.status(405).json({ error: "Only POST allowed" });
+    if (event.httpMethod !== "POST") {
+      return {
+        statusCode: 405,
+        body: JSON.stringify({ error: "Only POST allowed" })
+      };
     }
 
-    const { sourceURL, repoName } = await req.json();
+    const { sourceURL, repoName } = JSON.parse(event.body || "{}");
 
     if (!sourceURL || !repoName) {
-      return res.status(400).json({ error: "sourceURL and repoName required" });
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "sourceURL and repoName required" })
+      };
     }
 
     const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-    const GITHUB_USER = "ishakuyusufmaina"; //process.env.GITHUB_USER; // set this in Netlify env vars
+    const GITHUB_USER = "ishakuyusufmaina"; // or process.env.GITHUB_USER
 
     if (!GITHUB_TOKEN || !GITHUB_USER) {
-      return res.status(500).json({ error: "GitHub credentials not configured" });
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "GitHub credentials not configured" })
+      };
     }
 
     // 1. Create GitHub repository
@@ -25,7 +33,7 @@ export default async function handler(req, res) {
       method: "POST",
       headers: {
         "Authorization": `token ${GITHUB_TOKEN}`,
-        "Accept": "application/vnd.github+json"
+        "Accept": "application/vnd.github+json`
       },
       body: JSON.stringify({
         name: repoName,
@@ -35,7 +43,10 @@ export default async function handler(req, res) {
 
     if (!createRepoResp.ok) {
       const errText = await createRepoResp.text();
-      return res.status(500).json({ error: "Failed to create repo", details: errText });
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "Failed to create repo", details: errText })
+      };
     }
 
     // 2. Trigger GitHub Import
@@ -45,7 +56,7 @@ export default async function handler(req, res) {
         method: "PUT",
         headers: {
           "Authorization": `token ${GITHUB_TOKEN}`,
-          "Accept": "application/vnd.github+json"
+          "Accept": "application/vnd.github+json`
         },
         body: JSON.stringify({
           vcs: "git",
@@ -56,18 +67,27 @@ export default async function handler(req, res) {
 
     if (!importResp.ok) {
       const errText = await importResp.text();
-      return res.status(500).json({ error: "Import failed", details: errText });
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "Import failed", details: errText })
+      };
     }
 
     const importData = await importResp.json();
 
-    return res.status(200).json({
-      success: true,
-      message: "Repo created and import started",
-      importStatus: importData
-    });
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        success: true,
+        message: "Repo created and import started",
+        importStatus: importData
+      })
+    };
 
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message })
+    };
   }
 }
