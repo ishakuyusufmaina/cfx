@@ -1,4 +1,4 @@
-const { Octokit } = require("@octokit/rest");
+const { Octokit }  = require("@octokit/rest");
 const github = process.env.GH_TOKEN;
 const owner = "ishakuyusufmaina";//process.env.GITHUB_OWNER;
 const branch = /*process.env.GITHUB_BRANCH || */ "main";
