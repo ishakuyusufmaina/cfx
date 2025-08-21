@@ -36,7 +36,7 @@ exports.handler = async (event) => {
      }
      
     return {
-      statusCode: response.statusCode,
+       statusCode: 500,
        body: JSON.stringify({error: "configuration failed"})
        
      } 
