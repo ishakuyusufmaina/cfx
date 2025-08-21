@@ -25,7 +25,7 @@ exports.handler = async (event) => {
         });
     const data = await response.json();
 
-   if (response.ok) {
+   if (response.ok) 
      return {
        statusCode: 200,
        body: JSON.stringify({ok: true, message:  "configuration done"})
