@@ -5,7 +5,7 @@ exports.handler = (event)=>{
   const token = process.env.CF_TOKEN;
   const zoneId = process.env.ZONE_ID;
   const subdomain = JSON.parse(event.body).schoolDomain;
-  const target = "ishakuyusufmaina.guthu.io"; // fixed target
+  const target = "ishakuyusufmaina.github.io"; // fixed target
   const data = {
     type: "CNAME",
     name: subdomain,
