@@ -12,7 +12,10 @@ exports.handler = async (event) => {
   const schoolName = "${schoolName.toUpperCase()}"
   `;
   const contentBase64 = Buffer.from(content, "utf-8").toString("base64");
-
+      const body = {
+        message: "Config uploaded via API",
+        content: contentBase64
+      };
   try {
     const response = await fetch(url, {
           method: 'PUT',
