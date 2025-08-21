@@ -6,7 +6,7 @@ exports.handler = async (event) => {
   const repo = JSON.parse(event.body).repoName;
   const subdomain = JSON.parse(event.body).domain;
   const owner = "ishakuyusufmaina";
-  const url = `https://api.github.com/repos/${owner}/${repoName}/contents/CNAME`;
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/CNAME`;
   const content = Buffer.from(`${subdomain}.mainafly.com`, "utf-8").toString("base64");
 
   try {
