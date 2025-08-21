@@ -24,7 +24,7 @@ exports.handler = async (event) => {
    if (response.ok) {
      return {
        statusCode: 200,
-       body: JSON.stringify({ok: true, message: `${repoName} is published @ ${subdomain}.mainafly.com`})
+       body: JSON.stringify({ok: true, message: `${repo} is published @ ${subdomain}.mainafly.com`})
        
      }
    }
