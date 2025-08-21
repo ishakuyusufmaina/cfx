@@ -23,7 +23,7 @@ exports.handler = async (event)=>{
       },
       body: JSON.stringify(data)
     });
-     //const result = await response.json();
+     const result = await response.text();
     if (response.ok)
       return {
         ok: true,
@@ -31,8 +31,8 @@ exports.handler = async (event)=>{
         body: JSON.stringify({message: "domain name registered"})
       }
     return {
-       statusCode: response.statusCode,
-       body: JSON.stringify({error: "Failed to register domain"})
+       statusCode: 500,
+       body: JSON.stringify({error: "Failed to register domain "+result})
     }
     
   } catch (e) {
