@@ -26,7 +26,8 @@ exports.handler = async (event) => {
           },
           body: JSON.stringify(body)
         });
- //   const data = await response.json();
+ //
+  const data = await response.text();
 
    if (response.ok) 
      return {
@@ -37,7 +38,7 @@ exports.handler = async (event) => {
      
     return {
        statusCode: 500,
-       body: JSON.stringify({error: "configuration failed" + JSON.stringify(response)})
+       body: JSON.stringify({error: "configuration failed " + data})
        
      } 
   } catch(e){
