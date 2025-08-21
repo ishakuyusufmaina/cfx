@@ -2,16 +2,16 @@
 // This version creates the target repo before dispatching workflow
 
 const EVENT_TYPE = /* process.env.EVENT_TYPE || */ "clone-repo";
-
+const sourceURL = "https://github.com/ishakuyusufmaina/safa";
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: JSON.stringify({ error: "Method Not Allowed" }) };
   }
 
   try {
-    const { repoName, sourceURL } = JSON.parse(event.body || "{}");
-    if (!repoName || !sourceURL) {
-      return { statusCode: 400, body: JSON.stringify({ error: "repoName and sourceURL are required" }) };
+    const { schoolId } = JSON.parse(event.body || "{}");
+    if (!schoolId) {
+      return { statusCode: 400, body: JSON.stringify({ error: "schoolId are required" }) };
     }
 
     const token = process.env.GH_TOKEN;
@@ -30,12 +30,12 @@ exports.handler = async (event) => {
         "Accept": "application/vnd.github+json",
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ name: repoName, private: false })
+      body: JSON.stringify({ name: schoolId, private: false })
     });
 
     if (createRes.status === 422) {
       // Repo already exists
-      console.log(`Repo ${repoName} already exists, continuing...`);
+      console.log(`Repo ${schoolId} already exists, continuing...`);
     } else if (!createRes.ok) {
       const errText = await createRes.text();
       return { statusCode: createRes.status, body: JSON.stringify({ error: `Failed to create repo: ${errText}` }) };
@@ -45,7 +45,7 @@ exports.handler = async (event) => {
     const dispatchUrl = `https://api.github.com/repos/${owner}/${automationRepo}/dispatches`;
     const payload = {
       event_type: EVENT_TYPE,
-      client_payload: { repoName, sourceURL, owner }
+      client_payload: { schoolId, sourceURL, owner }
     };
 
     const dispatchRes = await fetch(dispatchUrl, {
@@ -64,7 +64,7 @@ exports.handler = async (event) => {
       return { statusCode: dispatchRes.status, body: JSON.stringify({ error: `Dispatch failed: ${text}` }) };
     }
 
-    return { statusCode: 200, body: JSON.stringify({ ok: true, repo: repoName, source: sourceURL }) };
+    return { statusCode: 200, body: JSON.stringify({ ok: true, repo: schoolId, source: sourceURL }) };
   } catch (err) {
     return { statusCode: 500, body: JSON.stringify({ error: err.message || String(err) }) };
   }
