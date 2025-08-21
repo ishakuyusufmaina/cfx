@@ -6,6 +6,7 @@ exports.handler = async (event)=>{
   const token = process.GH_TOKEN;
   const repo = JSON.parse(event.body).schoolId;
   const branch= "main";
+  try {
   const response = await fetch(`https://api.github.com/repos/${username}/${repo}/pages`, {
         method: 'POST',
         headers: {
@@ -34,6 +35,12 @@ exports.handler = async (event)=>{
       }
   return {
     statusCode: 500,
-    error: "App publication failed "+data
+    body: JSON.stringify({error: "App publication failed "+data})
+  }
+  } catch(e){
+    return {
+      statusCode: 500,
+      body: JSON.stringify({error: e.message})
+    }
   }
 }
