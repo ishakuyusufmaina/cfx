@@ -1,7 +1,6 @@
 const { Octokit } = require("@octokit/rest");
-const github = process.env.GITHUB_TOKEN;
-const owner = process.env.GITHUB_OWNER;
-const repo = process.env.GITHUB_REPO;
+const github = process.env.GH_TOKEN;
+const owner = "ishakuyusufmaina";//process.env.GITHUB_OWNER;
 const branch = process.env.GITHUB_BRANCH || "main";
 
 const octokit = new Octokit({ auth: github });
@@ -9,6 +8,7 @@ const octokit = new Octokit({ auth: github });
 exports.handler = async (event) => {
   try {
     const files = JSON.parse(event.body).files; // Expect [{ path, contentBase64 }, ...]
+    const repo = JSON.parse(event.body).schoolId;//process.env.GITHUB_REPO;
     const blobs = await Promise.all(
       files.map(f =>
         octokit.git.createBlob({
