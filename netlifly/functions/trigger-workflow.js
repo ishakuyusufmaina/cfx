@@ -45,7 +45,7 @@ exports.handler = async (event) => {
     const dispatchUrl = `https://api.github.com/repos/${owner}/${automationRepo}/dispatches`;
     const payload = {
       event_type: EVENT_TYPE,
-      client_payload: { schoolId, sourceURL, owner }
+      client_payload: { repoName: schoolId, sourceURL: sourceURL, owner: owner }
     };
 
     const dispatchRes = await fetch(dispatchUrl, {
