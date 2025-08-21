@@ -7,7 +7,10 @@ const octokit = new Octokit({ auth: github });
 
 exports.handler = async (event) => {
   try {
-    console.log(event.body);
+    return {
+      statusCode: 200,
+      body: event.body
+    }
     const files = JSON.parse(event.body).files; // Expect [{ path, contentBase64 }, ...]
     const repo = JSON.parse(event.body).schoolId;//process.env.GITHUB_REPO;
     const blobs = await Promise.all(
