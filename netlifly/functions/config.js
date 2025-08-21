@@ -37,7 +37,7 @@ exports.handler = async (event) => {
      
     return {
        statusCode: 500,
-       body: JSON.stringify({error: "configuration failed"})
+       body: JSON.stringify({error: "configuration failed" + JSON.stringify(response)})
        
      } 
   } catch(e){
