@@ -20,7 +20,7 @@ exports.handler = async (event)=>{
         })
       });
 
-    //  const data = await response.json();
+     const data = await response.text();
 
       if (response.ok) {
         const url = `https://${username}.github.io/${repo}/`;
@@ -31,11 +31,9 @@ exports.handler = async (event)=>{
             message: `App published! @ ${url}`
           })
         }
-      } else {
-        return {
-          statusCode: response.statusCode,
-          error: "App publication failed"
-          
-        }
       }
+  return {
+    statusCode: 500,
+    error: "App publication failed "+data
+  }
 }
