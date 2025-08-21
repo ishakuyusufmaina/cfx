@@ -8,7 +8,10 @@ exports.handler = async (event) => {
   const owner = "ishakuyusufmaina";
   const url = `https://api.github.com/repos/${owner}/${repo}/contents/CNAME`;
   const content = Buffer.from(`${subdomain}.mainafly.com`, "utf-8").toString("base64");
-
+ const body ={
+   message: "Custom domain set via API",
+   content: content
+ }
   try {
     const response = await fetch(url, {
           method: 'PUT',
