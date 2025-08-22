@@ -6,11 +6,7 @@ const branch = /*process.env.GITHUB_BRANCH || */ "main";
 const octokit = new Octokit({ auth: github });
 
 exports.handler = async (event) => {
-  return {
-      statusCode: 200,
-      body: "body:" + event.body
-      
-    }
+  
   try {
     
     const {files, repo} = JSON.parse(event.body) // Expect [{ path, contentBase64 }, ...]
