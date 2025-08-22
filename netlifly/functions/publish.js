@@ -3,7 +3,7 @@ exports.handler = async (event)=>{
     return { statusCode: 405, body: JSON.stringify({ error: "Method Not Allowed" }) };
   }
   const username= "ishakuyusufmaina";
-  const token = process.GH_TOKEN;
+  const token = process.env.GH_TOKEN;
   const repo = JSON.parse(event.body).schoolId;
   const branch= "main";
   try {
