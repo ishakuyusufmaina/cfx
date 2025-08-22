@@ -9,8 +9,7 @@ exports.handler = async (event) => {
   
   try {
     
-    const {files, repo} = JSON.parse(event.body) // Expect [{ path, contentBase64 }, ...]
-   // const repo = JSON.parse(event.body)//process.env.GITHUB_REPO;
+    const {files, repo} = JSON.parse(event.body); 
     const blobs = await Promise.all(
       files.map(f =>
         octokit.git.createBlob({
@@ -56,7 +55,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({ message: "Success", commitSha: commit.sha })
     };
   } catch (err) {
-    console.log("Error: ");
+    console.log("Error, I wrote: ");
     console.error(err);
     return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
   }
