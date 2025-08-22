@@ -3,11 +3,12 @@ const github = process.env.GH_TOKEN;
 const owner = "ishakuyusufmaina";//process.env.GITHUB_OWNER;
 const branch = /*process.env.GITHUB_BRANCH || */ "main";
 
-const octokit = new Octokit({ auth: github });
 
 exports.handler = async (event) => {
-  
-  try {
+    try {
+      const octokit = new Octokit({ auth: github });
+
+      
 //    let body = JSON.parse(event.body);
     return {
       statusCode:200,
