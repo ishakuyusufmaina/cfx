@@ -56,6 +56,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({ message: "Success", commitSha: commit.sha })
     };
   } catch (err) {
+    console.log("Error: ");
     console.error(err);
     return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
   }
