@@ -1,68 +1,75 @@
-const { Octokit }  = require("@octokit/rest");
-const github = process.env.GH_TOKEN;
-const owner = "ishakuyusufmaina";//process.env.GITHUB_OWNER;
-const branch = /*process.env.GITHUB_BRANCH || */ "main";
+// netlify/functions/uploadFiles.js
+const { Octokit } = require("@octokit/rest");
 
+const octokit = new Octokit({
+  auth: process.env.GH_TOKEN, // set this in your environment variables
+});
 
-exports.handler = async (event) => {
-    try {
-      const octokit = new Octokit({ auth: github });
+const OWNER = "ishakuyusufmaina";
+//const REPO = "your-repo-name";
+const BRANCH = "main"; // or "master"
 
-      
-//    let body = JSON.parse(event.body);
-    return {
-      statusCode:200,
-      body: event.body
+exports.handler = async (event, context) => {
+  try {
+    if (event.httpMethod !== "POST") {
+      return {
+        statusCode: 405,
+        body: JSON.stringify({ error: "Method not allowed" }),
+      };
     }
-    const files = [];
-    const repo = "r";
-    const blobs = await Promise.all(
-      files.map(f =>
-        octokit.git.createBlob({
-          owner, repo,
-          content: f.contentBase64,
-          encoding: "base64"
-        })
-      )
-    );
 
-    const { data: refData } = await octokit.git.getRef({ owner, repo, ref: `heads/${branch}` });
-    const baseSha = refData.object.sha;
+    const body = JSON.parse(event.body);
+    const { files, REPO} = body;
 
-    const { data: treeData } = await octokit.git.getTree({ owner, repo, tree_sha: baseSha });
-    const tree = await octokit.git.createTree({
-      owner, repo,
-      base_tree: treeData.sha,
-      tree: files.map((f, i) => ({
-        path: f.path,
-        mode: "100644",
-        type: "blob",
-        sha: blobs[i].sha
-      }))
-    });
+    if (!files || !Array.isArray(files)) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Invalid payload" }),
+      };
+    }
 
-    const commit = await octokit.git.createCommit({
-      owner, repo,
-      message: files.length > 1
-        ? `Add/update ${files.length} files`
-        : `Add/update ${files[0].path}`,
-      tree: tree.sha,
-      parents: [baseSha]
-    });
+    const results = [];
 
-    await octokit.git.updateRef({
-      owner, repo,
-      ref: `heads/${branch}`,
-      sha: commit.sha
-    });
+    for (const file of files) {
+      const { path, content } = file;
+
+      // Get current SHA if file exists
+      let sha = undefined;
+      try {
+        const { data } = await octokit.repos.getContent({
+          owner: OWNER,
+          repo: REPO,
+          path,
+          ref: BRANCH,
+        });
+        sha = data.sha;
+      } catch (err) {
+        if (err.status !== 404) throw err;
+      }
+
+      // Create or update file
+      const { data } = await octokit.repos.createOrUpdateFileContents({
+        owner: OWNER,
+        repo: REPO,
+        path,
+        message: `Add/Update ${path}`,
+        content: Buffer.from(content).toString("base64"),
+        branch: BRANCH,
+        sha,
+      });
+
+      results.push({ path, status: "uploaded", url: data.content.html_url });
+    }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Success", commitSha: commit.sha })
+      body: JSON.stringify({ success: true, results }),
     };
-  } catch (err) {
-    console.log("Error, I wrote: ");
-    console.error(err);
-    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
+  } catch (error) {
+    console.error("Upload error:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: error.message }),
+    };
   }
 };
