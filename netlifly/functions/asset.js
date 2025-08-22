@@ -1,49 +1,60 @@
-const token = process.env.GH_TOKEN;
-exports.handler = async (event) => {
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: JSON.stringify({ error: "Method Not Allowed" }) };
-  }
-  const path= JSON.parse(event.body).path;
-  const schoolId= JSON.parse(event.body).schoolId;
-  const content = JSON.parse(event.body).content;
-  const owner = "ishakuyusufmaina";
-  const url = `https://api.github.com/repos/${owner}/${schoolId}/contents/${path}`;
-//  const content = JSON parse(event.body).content;
-//  const contentBase64 = Buffer.from(content, "utf-8").toString("base64");
-      const body = {
-        message: "file uploaded via API",
-        content: content
-      };
-  try {
-    const response = await fetch(url, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/vnd.github+json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(body)
-        });
- //
-  const data = await response.text();
+// functions/upload-file.js
+const { Octokit } = require("@octokit/rest");
 
-   if (response.ok) 
-     return {
-       statusCode: 200,
-       body: JSON.stringify({ok: true, message:  "configuration done"})
-       
-     }
-     
+exports.handler = async (event) => {
+  try {
+    if (event.httpMethod !== "POST") {
+      return {
+        statusCode: 405,
+        body: JSON.stringify({ error: "Method Not Allowed" }),
+      };
+    }
+
+    const { content, path, repo } = JSON.parse(event.body || "{}");
+    if (!content || !path || !repo) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Missing required fields: content, path, repo" }),
+      };
+    }
+
+    // Ensure you set this in your Netlify environment variables
+    const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+    if (!GITHUB_TOKEN) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "GitHub token not configured" }),
+      };
+    }
+
+    const octokit = new Octokit({ auth: GITHUB_TOKEN });
+
+    // Split repo into owner and repo
+    const [owner, repoName] = repo.split("/");
+
+    // Upload the file (GitHub expects base64 content)
+    const response = await octokit.repos.createOrUpdateFileContents({
+      owner,
+      repo: repoName,
+      path,
+      message: `Add/Update ${path}`,
+      content: Buffer.from(content).toString("base64"),
+    });
+
     return {
-       statusCode: 500,
-       body: JSON.stringify({error: "configuration failed " + data})
-       
-     } 
-  } catch(e){
+      statusCode: 200,
+      body: JSON.stringify({
+        message: "File uploaded successfully",
+        data: response.data,
+      }),
+    };
+  } catch (error) {
+    console.error("Error uploading file:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({error: e.message})
-    }
+      body: JSON.stringify({
+        error: error.message,
+      }),
+    };
   }
-  
-}
+};
