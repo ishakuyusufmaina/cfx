@@ -9,7 +9,7 @@ exports.handler = async (event) => {
   const owner = "ishakuyusufmaina";
   const url = `https://api.github.com/repos/${owner}/${schoolId}/contents/${path}`;
 //  const content = JSON parse(event.body).content;
-  const contentBase64 = Buffer.from(content, "utf-8").toString("base64");
+//  const contentBase64 = Buffer.from(content, "utf-8").toString("base64");
       const body = {
         message: "file uploaded via API",
         content: content
