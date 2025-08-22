@@ -8,8 +8,11 @@ const octokit = new Octokit({ auth: github });
 exports.handler = async (event) => {
   
   try {
-    
-    const {files, repo} = JSON.parse(event.body); 
+//    let body = JSON.parse(event.body);
+    return {
+      statusCode:200,
+      body: event.body
+    }
     const blobs = await Promise.all(
       files.map(f =>
         octokit.git.createBlob({
