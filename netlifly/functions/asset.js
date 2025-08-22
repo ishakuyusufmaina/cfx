@@ -13,6 +13,8 @@ exports.handler = async (event) => {
       statusCode:200,
       body: event.body
     }
+    const files = [];
+    const repo = "r";
     const blobs = await Promise.all(
       files.map(f =>
         octokit.git.createBlob({
