@@ -18,7 +18,7 @@ exports.handler = async (event, context) => {
     if (!account_number || !bank_code) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "account_number and bank_code are required" }),
+        body: JSON.stringify({ error: "account_number and bank_code are required" })
       };
     }
 
@@ -29,10 +29,10 @@ exports.handler = async (event, context) => {
       headers: {
         Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
         "Content-Type": "application/json",
-      },
+      }
     });
 
-    const data = await response.json();
+    const data = await response.text();
 
     if (!response.status) {
       return {
