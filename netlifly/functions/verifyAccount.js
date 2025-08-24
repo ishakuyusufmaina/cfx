@@ -34,7 +34,7 @@ exports.handler = async (event, context) => {
 
     const data = await response.json();
 
-    if (!data.status) {
+    if (!response.status) {
       return {
         statusCode: 400,
         body: JSON.stringify({ error: "Failed to resolve account", details: data }),
@@ -43,7 +43,7 @@ exports.handler = async (event, context) => {
 
     return {
       statusCode: 200,
-      body: JSON.stringify(data.data), // returns account_name, account_number, bank_id
+      body: JSON.stringify(data), // returns account_name, account_number, bank_id
     };
   } catch (error) {
     return {
