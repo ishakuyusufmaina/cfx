@@ -1,6 +1,6 @@
 // Netlify Function: Get Nigerian Banks via Paystack API
 
-export.handler = async (event, context) => {
+exports.handler = async (event, context) => {
   try {
     
     const PAYSTACK_SECRET_KEY = process.env.PS_SECRET_KEY;
