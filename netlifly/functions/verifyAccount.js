@@ -1,7 +1,7 @@
 // Netlify Function: Verify Account Number via Paystack API
 // Expects query params: account_number, bank_code
 
-export async function handler(event, context) {
+exports.handler = async (event, context) => {
   try {
     const PAYSTACK_SECRET_KEY = process.env.PS_SECRET_KEY;
 
