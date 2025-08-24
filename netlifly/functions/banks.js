@@ -2,8 +2,8 @@
 
 export.handler = async (event, context) => {
   try {
-    // Your Paystack secret key (store it in Netlify environment variables)
-    const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
+    
+    const PAYSTACK_SECRET_KEY = process.env.PS_SECRET_KEY;
 
     if (!PAYSTACK_SECRET_KEY) {
       return {
