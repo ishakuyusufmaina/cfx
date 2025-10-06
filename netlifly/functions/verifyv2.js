@@ -1,10 +1,9 @@
 import fetch from "node-fetch";
 import admin from "firebase-admin";
 
-// --- Initialize Firebase only once ---
 if (!admin.apps.length) {
   admin.initializeApp({
-    credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SIB_CONFIG))
+    credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SIB_CONFIG)),
   });
 }
 
@@ -12,67 +11,53 @@ const db = admin.firestore();
 
 export async function handler(event) {
   try {
-    if (event.httpMethod !== "POST") {
-      return {
-        statusCode: 405,
-        body: JSON.stringify({ error: "Method not allowed" }),
-      };
-    }
-
-    const { reference, schoolId } = JSON.parse(event.body || "{}");
+    const { reference, schoolId } = event.queryStringParameters || {};
 
     if (!reference || !schoolId) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Missing reference or schoolId" }),
+        body: "Missing reference or schoolId",
       };
     }
 
-    // --- Verify transaction with Paystack ---
-    const verifyResponse = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
+    // Verify transaction with Paystack
+    const verifyRes = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
       headers: {
         Authorization: `Bearer ${process.env.PS_SECRET_KEY}`,
       },
     });
 
-    const verifyData = await verifyResponse.json();
+    const verifyData = await verifyRes.json();
 
     if (!verifyData.status || verifyData.data.status !== "success") {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Transaction verification failed" }),
+        body: "Transaction verification failed.",
       };
     }
 
-    const amount = verifyData.data.amount / 100; // Convert from kobo to Naira
+    const amount = verifyData.data.amount / 100;
 
-    // --- Firestore Transaction to prevent race conditions ---
+    // Use Firestore transaction for atomic update
     const schoolRef = db.collection(schoolId).doc("account");
-
-    const newBalance = await db.runTransaction(async (t) => {
+    await db.runTransaction(async (t) => {
       const doc = await t.get(schoolRef);
-      const prevBalance = doc.exists ? doc.data().balance || 0 : 0;
-      const updatedBalance = prevBalance + amount;
-
-      t.set(schoolRef, { balance: updatedBalance }, { merge: true });
-      return updatedBalance;
+      const prev = doc.exists ? doc.data().balance || 0 : 0;
+      t.set(schoolRef, { balance: prev + amount }, { merge: true });
     });
 
+    // Redirect user to frontend success page
     return {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: "Payment verified and balance updated successfully.",
-        schoolId,
-        amount,
-        newBalance,
-        reference,
-      }),
+      statusCode: 302,
+      headers: {
+        Location: `https://${schoolId}.mainafly.com/payment-success?ref=${reference}&schoolId=${schoolId}`,
+      },
     };
   } catch (error) {
-    console.error("Error verifying transaction:", error);
+    console.error("Callback error:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message }),
+      body: "Internal Server Error: " + error.message,
     };
   }
 }
