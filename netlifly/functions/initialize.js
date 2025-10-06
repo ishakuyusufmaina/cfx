@@ -1,6 +1,6 @@
-import fetch from "node-fetch";
+const fetch = require("node-fetch");
 
-export async function handler(event) {
+exports.handler = async function (event) {
   try {
     const { email, amount, schoolId } = JSON.parse(event.body || "{}");
 
@@ -11,7 +11,7 @@ export async function handler(event) {
       };
     }
 
-    // Create transaction on Paystack
+    // Initialize Paystack transaction
     const res = await fetch("https://api.paystack.co/transaction/initialize", {
       method: "POST",
       headers: {
@@ -20,7 +20,7 @@ export async function handler(event) {
       },
       body: JSON.stringify({
         email,
-        amount: amount * 100,
+        amount: amount * 100, // Convert to kobo
         callback_url: `https://cfx-mainafly.netlify.app/.netlify/functions/callback?schoolId=${schoolId}`,
       }),
     });
@@ -31,11 +31,11 @@ export async function handler(event) {
       statusCode: 200,
       body: JSON.stringify(data),
     };
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error("Initialize error:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message }),
+      body: JSON.stringify({ error: error.message }),
     };
   }
-}
+};
