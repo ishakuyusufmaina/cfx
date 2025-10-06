@@ -1,15 +1,16 @@
-import fetch from "node-fetch";
-import admin from "firebase-admin";
+const fetch = require("node-fetch");
+const admin = require("firebase-admin");
 
+// Initialize Firebase once
 if (!admin.apps.length) {
   admin.initializeApp({
-    credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SIB_CONFIG))
+    credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SIB_CONFIG)),
   });
 }
 
 const db = admin.firestore();
 
-export async function handler(event) {
+exports.handler = async function (event) {
   try {
     const { reference, schoolId } = event.queryStringParameters || {};
 
@@ -20,10 +21,10 @@ export async function handler(event) {
       };
     }
 
-    // Verify transaction with Paystack
+    // Verify payment with Paystack
     const verifyRes = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
       headers: {
-        Authorization: `Bearer ${process.env.PS_SECRET_KEY}`,
+        Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
       },
     });
 
@@ -38,19 +39,19 @@ export async function handler(event) {
 
     const amount = verifyData.data.amount / 100;
 
-    // Use Firestore transaction for atomic update
+    // Firestore Transaction (atomic balance update)
     const schoolRef = db.collection(schoolId).doc("account");
     await db.runTransaction(async (t) => {
       const doc = await t.get(schoolRef);
-      const prev = doc.exists ? doc.data().balance || 0 : 0;
-      t.set(schoolRef, { balance: prev + amount }, { merge: true });
+      const prevBalance = doc.exists ? doc.data().balance || 0 : 0;
+      t.set(schoolRef, { balance: prevBalance + amount }, { merge: true });
     });
 
-    // Redirect user to frontend success page
+    // Redirect back to frontend success page
     return {
       statusCode: 302,
       headers: {
-        Location: `https://${schoolId}.mainafly.com/payment-success?ref=${reference}&schoolId=${schoolId}`,
+        Location: `https://yourfrontenddomain.com/payment-success?ref=${reference}&schoolId=${schoolId}`,
       },
     };
   } catch (error) {
@@ -60,4 +61,4 @@ export async function handler(event) {
       body: "Internal Server Error: " + error.message,
     };
   }
-}
+};
