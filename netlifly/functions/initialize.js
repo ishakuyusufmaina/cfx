@@ -1,6 +1,17 @@
 const fetch = require("node-fetch");
 
 exports.handler = async function (event) {
+  const headers = {
+    "Access-Control-Allow-Origin": "*", // You can restrict this to your domain
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+  };
+
+  // Handle preflight (OPTIONS) request
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 200, headers, body: "OK" };
+  }
+  
   try {
     const { email, amount, schoolId } = JSON.parse(event.body || "{}");
 
