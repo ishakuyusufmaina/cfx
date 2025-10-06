@@ -51,7 +51,7 @@ exports.handler = async function (event) {
     return {
       statusCode: 302,
       headers: {
-        Location: `https://yourfrontenddomain.com/payment-success?ref=${reference}&schoolId=${schoolId}`,
+        Location: `https://${schoolId}.mainafly.com/admin/bill.html?ref=${reference}&schoolId=${schoolId}`,
       },
     };
   } catch (error) {
