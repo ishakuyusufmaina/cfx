@@ -3,7 +3,7 @@ import admin from "firebase-admin";
 
 if (!admin.apps.length) {
   admin.initializeApp({
-    credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SIB_CONFIG)),
+    credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SIB_CONFIG))
   });
 }
 
