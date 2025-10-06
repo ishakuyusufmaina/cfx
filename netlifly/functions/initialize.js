@@ -18,6 +18,7 @@ exports.handler = async function (event) {
     if (!email || !amount || !schoolId) {
       return {
         statusCode: 400,
+        headers,
         body: JSON.stringify({ error: "Missing required fields" }),
       };
     }
@@ -40,12 +41,14 @@ exports.handler = async function (event) {
 
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify(data),
     };
   } catch (error) {
     console.error("Initialize error:", error);
     return {
       statusCode: 500,
+      headers,
       body: JSON.stringify({ error: error.message }),
     };
   }
