@@ -24,7 +24,7 @@ exports.handler = async function (event) {
     // Verify payment with Paystack
     const verifyRes = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
       headers: {
-        Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+        Authorization: `Bearer ${process.env.PS_SECRET_KEY}`,
       },
     });
 
