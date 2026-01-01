@@ -2,6 +2,9 @@
   functions = "netlify/functions"
   publish = "."
 
+[functions]
+  node_bundler = "esbuild"
+
 # Optional: redirect path to your function
 [[redirects]]
   from = "/api/hello"
