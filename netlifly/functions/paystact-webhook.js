@@ -8,7 +8,7 @@ exports.handler = async (event) => {
     }
 
     const paystackSignature = event.headers["x-paystack-signature"];
-    const secret = process.env.PAYSTACK_SECRET_KEY;
+    const secret = process.env.MSS_PS;
 
     // Verify signature
     const hash = crypto
