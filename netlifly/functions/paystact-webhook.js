@@ -26,7 +26,7 @@ exports.handler = async (event) => {
     // Handle events
     switch (eventType) {
       case "charge.success":
-        console.log("Payment successful:", data.reference);
+        console.log("Payment successful:", data.reference, JSON.stringify(data));
         // TODO: update DB, activate subscription, etc.
         break;
 
