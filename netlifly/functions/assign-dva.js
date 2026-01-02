@@ -78,6 +78,7 @@ exports.handler = async (event) => {
            studentName: std.name,
            studentId,
            schoolId,
+           schoolBatch,
            "class": std.class,
            session,
            term,
