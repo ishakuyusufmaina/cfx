@@ -47,7 +47,9 @@ exports.handler = async (event) => {
       case "dedicatedaccount.assign.success":
         const dva = data.dedicated_account;
         const schoolAdmin = require("firebase-admin");
-        const schoolSecret = await secretsCol.doc(meta.schoolBatch).get();
+        const schoolSecret = await secretsCol
+          .doc(meta.schoolBatch)
+          .get().data().root;
         if (!schoolAdmin.apps.length){
           schoolAdmin.initializeApp({
             credential: JSON.parse(schoolSecret)
