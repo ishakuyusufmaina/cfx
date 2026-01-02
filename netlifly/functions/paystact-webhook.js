@@ -1,15 +1,15 @@
 const crypto = require("crypto");
-const unityAdmin = require("firebase-admin");
+const admin = require("firebase-admin");
 //const admin = require("firebase-admin");
 
 // Initialize Unity Firebase once
-if (!unityAdmin.apps.length) {
-  unityAdmin.initializeApp({
-    credential: unityAdmin.credential.cert(JSON.parse(process.env.UNITY_CONFIG)),
-  });
+if (!admin.apps.some(app=>app.name=="unity")) {
+  admin.initializeApp({
+    credential: admin.credential.cert(JSON.parse(process.env.UNITY_CONFIG)),
+  }, "unity");
 }
 
-const udb = unityAdmin.firestore();
+const udb = admin.app("unity").firestore();
 const secretsCol = udb.collection("secrets");
 // Initialize Firebase once
 /*if (!admin.apps.length) {
@@ -46,16 +46,16 @@ exports.handler = async (event) => {
     switch (eventType) {
       case "dedicatedaccount.assign.success":
         const dva = data.dedicated_account;
-        const schoolAdmin = require("firebase-admin");
+       // const schoolAdmin = require("firebase-admin");
         const schoolSecret = await secretsCol
           .doc(meta.schoolBatch)
           .get().data().root;
-        if (!schoolAdmin.apps.length){
-          schoolAdmin.initializeApp({
-            credential: schoolAdmin.credential.cert(JSON.parse(schoolSecret))
-          })
+        if (!admin.apps.some(app=>app.name=="school")){
+          admin.initializeApp({
+            credential: admin.credential.cert(JSON.parse(schoolSecret))
+          }, "school")
         }
-        const schoolDb = schoolAdmin.firestore();
+        const schoolDb = admin.app("school").firestore();
         const stdRef = schoolDb
           .collection(meta.schoolId)
           .doc("db")
@@ -78,7 +78,7 @@ exports.handler = async (event) => {
         // TODO: update DB, activate subscription, etc.
         const payment = {
           "class": meta.class,
-          timestamp: unityAdmin.firestore.Timestamp.fromDate(
+          timestamp: admin.firestore.Timestamp.fromDate(
              new Date(data.paid_at)
           ),
           reference: data.reference,
@@ -95,12 +95,12 @@ exports.handler = async (event) => {
         const pbSecretDoc = await pbSecretRef.get();
         const pbSecret = pbSecretDoc.data().root;
         const pbAdmin = require("firebase-admin");
-        if (!pbAdmin.apps.length) {
-          pbAdmin.initializeApp({
-            credential: pbAdmin.credential.cert(JSON.parse(pbSecret))
+        if (!admin.apps.some(app=>app.name=="paybook")) {
+          admin.initializeApp({
+            credential: admin.credential.cert(JSON.parse(pbSecret))
           });
         }
-        const pbdb = pbAdmin.firetore();
+        const pbdb = admin.app("paybook").firetore();
         await pbdb.collection("payments").add(payment);
         break;
 
