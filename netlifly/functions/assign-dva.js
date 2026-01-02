@@ -25,8 +25,7 @@ exports.handler = async (event) => {
 
     // Verify signature
 
-    const { studentId, schoolId, schoolBatch, term, session } = JSON.parse(event.body);
-
+    const { studentId, schoolId, schoolBatch, term, session } = JSON.parse(event.body || "{}");
     const requiredFields = { studentId, schoolId, schoolBatch, term, session };
     const missingFields = Object.entries(requiredFields)
        .filter(([_, value]) => !value)
@@ -47,7 +46,7 @@ exports.handler = async (event) => {
       .doc(schoolBatch)
       .get().data().root;
     if (!admin.apps.some(app=>app.name=="school")){
-      schoolAdmin.initializeApp({
+      admin.initializeApp({
         credential: admin.credential.cert(JSON.parse(schoolSecret))
       },
       "school"
