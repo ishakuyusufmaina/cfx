@@ -42,9 +42,9 @@ exports.handler = async (event) => {
     }
     
     
-    const schoolSecret = await secretsCol
-      .doc(schoolBatch)
-      .get().data().root;
+    const schoolSecretRef = secretsCol.doc(schoolBatch)
+     const schoolSecretDoc = await schoolSecretRef.get()
+    const schoolSecret = schoolSecretDoc.data().root;
     if (!admin.apps.some(app=>app.name=="school")){
       admin.initializeApp({
         credential: admin.credential.cert(JSON.parse(schoolSecret))
