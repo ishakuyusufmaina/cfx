@@ -5,7 +5,7 @@ const unityAdmin = require("firebase-admin");
 // Initialize Unity Firebase once
 if (!unityAdmin.apps.length) {
   unityAdmin.initializeApp({
-    credential: admin.credential.cert(JSON.parse(process.env.UNITY_CONFIG)),
+    credential: unityAdmin.credential.cert(JSON.parse(process.env.UNITY_CONFIG)),
   });
 }
 
@@ -52,7 +52,7 @@ exports.handler = async (event) => {
           .get().data().root;
         if (!schoolAdmin.apps.length){
           schoolAdmin.initializeApp({
-            credential: JSON.parse(schoolSecret)
+            credential: schoolAdmin.credential.cert(JSON.parse(schoolSecret))
           })
         }
         const schoolDb = schoolAdmin.firestore();
@@ -97,7 +97,7 @@ exports.handler = async (event) => {
         const pbAdmin = require("firebase-admin");
         if (!pbAdmin.apps.length) {
           pbAdmin.initializeApp({
-            credential: JSON.parse(pbSecret)
+            credential: pbAdmin.credential.cert(JSON.parse(pbSecret))
           });
         }
         const pbdb = pbAdmin.firetore();
