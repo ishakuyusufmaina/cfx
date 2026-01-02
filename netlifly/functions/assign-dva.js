@@ -1,3 +1,14 @@
+const crypto = require("crypto");
+const unityAdmin = require("firebase-admin");
+
+if (!unityAdmin.apps.length) {
+  unityAdmin.initializeApp({
+    credential: admin.credential.cert(JSON.parse(process.env.UNITY_CONFIG)),
+  });
+}
+const udb = unityAdmin.firestore();
+const secretsCol = udb.collection("secrets");
+
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return {
@@ -7,14 +18,56 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { customerCode, preferredBank } = JSON.parse(event.body);
+    const paystackSignature = event.headers["x-paystack-signature"];
+    const secret = process.env.MSS_PS;
 
+    // Verify signature
+    
+    const { studentId, schoolId, schoolBatch, term, session } = JSON.parse(event.body);
     if (!customerCode) {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: "customerCode is required" }),
       };
     }
+    const schoolAdmin = require("firebase-admin");
+    const schoolSecret = await secretsCol
+      .doc(schoolBatch)
+      .get().data().root;
+    if (!schoolAdmin.apps.length){
+      schoolAdmin.initializeApp({
+        credential: JSON.parse(schoolSecret)
+      })
+    }
+    const schoolDb = schoolAdmin.firestore();
+    const schoolProfile = await schoolDb
+      .collection(schoolId)
+      .doc("profile").get().data();
+    const stdRef = schoolDb
+      .collection(schoolId)
+      .doc("db")
+      .collection("students")
+      .doc(studentId);
+    const std = await stdRef.get().data();
+    const stdNames = std.name.replace(/\s+/g, ' ').trim().split(" ");
+    const data={ 
+      "email": `${schoolId}.${studentId}@gmail.com`,
+      "first_name": stdNames[0],
+      "middle_name": stdNames.length==3? stdNames[1] : "",
+      "last_name": stdNames[stdNames.length-1],
+      "phone": schoolProfile.phoneNumber,
+      "country": "NG",
+       split_code: schoolProfile.splitCode,
+       "metadata": {
+           studentName: std.stdName,
+           studentId,
+           schoolId,
+           "class": std.class,
+           session,
+           term,
+           "for": "school-fees"
+         }
+       }
 
     const response = await fetch(
       "https://api.paystack.co/dedicated_account/assign",
