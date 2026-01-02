@@ -53,9 +53,11 @@ exports.handler = async (event) => {
      )
     }
     const schoolDb = admin.app("school").firestore();
-    const schoolProfile = await schoolDb
+    const schoolProfileRef =  schoolDb
       .collection(schoolId)
-      .doc("profile").get().data();
+      .doc("profile");
+    const schoolProfileDoc = await schoolProfileRef.get();
+    const schoolProfile = schoolProfileDoc.data();
     const stdRef = schoolDb
       .collection(schoolId)
       .doc("db")
