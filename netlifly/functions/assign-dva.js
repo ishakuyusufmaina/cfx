@@ -22,14 +22,23 @@ exports.handler = async (event) => {
     const secret = process.env.MSS_PS;
 
     // Verify signature
+
+    const requiredFields = { studentId, schoolId, schoolBatch, term, session };
+    const missingFields = Object.entries(requiredFields)
+       .filter(([_, value]) => !value)
+        .map(([key]) => key);
     
-    const { studentId, schoolId, schoolBatch, term, session } = JSON.parse(event.body);
-    if (!customerCode) {
+    if (missingFields.length) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: "customerCode is required" }),
+        body: JSON.stringify({
+          message: "Missing required fields",
+          missingFields
+        })
       };
     }
+    
+    
     const schoolAdmin = require("firebase-admin");
     const schoolSecret = await secretsCol
       .doc(schoolBatch)
@@ -81,14 +90,14 @@ exports.handler = async (event) => {
       }
     );
 
-    const data = await response.json();
+    const res_data = await response.json();
 
     return {
       statusCode: response.status,
       body: JSON.stringify({
         success: true,
         message: "Dedicated account assigned",
-        data,
+        data: res_data
       }),
     };
 
