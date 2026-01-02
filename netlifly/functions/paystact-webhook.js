@@ -1,4 +1,22 @@
 const crypto = require("crypto");
+const unityAdmin = require("firebase-admin");
+//const admin = require("firebase-admin");
+
+// Initialize Unity Firebase once
+if (!unityAdmin.apps.length) {
+  unityAdmin.initializeApp({
+    credential: admin.credential.cert(JSON.parse(process.env.UNITY_CONFIG)),
+  });
+}
+
+const udb = unityAdmin.firestore();
+const secretsCol = udb.collection("secrets");
+// Initialize Firebase once
+/*if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SIB_CONFIG)),
+  });
+}*/
 
 exports.handler = async (event) => {
   try {
@@ -22,12 +40,66 @@ exports.handler = async (event) => {
 
     const payload = JSON.parse(event.body);
     const { event: eventType, data } = payload;
-
+    const meta = data.metadata;
+    
     // Handle events
     switch (eventType) {
+      case "dedicatedaccount.assign.success":
+        const dva = data.dedicated_account;
+        const schoolAdmin = require("firebase-admin");
+        const schoolSecret = await secretsCol.doc(meta.schoolBatch).get();
+        if (!schoolAdmin.apps.length){
+          schoolAdmin.initializeApp({
+            credential: JSON.parse(schoolSecret)
+          })
+        }
+        const schoolDb = schoolAdmin.firestore();
+        const stdRef = schoolDb
+          .collection(meta.schoolId)
+          .doc("db")
+          .collection("students")
+          .doc(meta.studentId);
+        await stdRef.update({
+          account: {
+            accountNumber: dva.account_number,
+            accountName: dva.account_name,
+            bankName: dva.bank.name,
+            id: dva.id,
+            createdAt: dva.created_at,
+            updatedAt: dva.updated_at            
+          }
+        });
+        break;
+      
       case "charge.success":
         console.log("Payment successful:", data.reference, JSON.stringify(data));
         // TODO: update DB, activate subscription, etc.
+        const payment = {
+          "class": meta.class,
+          timestamp: unityAdmin.firestore.Timestamp.fromDate(
+             new Date(data.paid_at)
+          ),
+          reference: data.reference,
+          "for": meta.for,
+          term: meta.term,
+          session: meta.session,
+          amount: Number(data.amount),
+          schoolId: meta.schoolId,
+          studentId: meta.studentId,
+          studentName: meta.studentName
+          
+        }
+        const pbSecretRef = secretsCol.doc("paymentbook");
+        const pbSecretDoc = await pbSecretRef.get();
+        const pbSecret = pbSecretDoc.data().root;
+        const pbAdmin = require("firebase-admin");
+        if (!pbAdmin.apps.length) {
+          pbAdmin.initializeApp({
+            credential: JSON.parse(pbSecret)
+          });
+        }
+        const pbdb = pbAdmin.firetore();
+        await pbdb.collection("payments").add(payment);
         break;
 
       case "transfer.success":
