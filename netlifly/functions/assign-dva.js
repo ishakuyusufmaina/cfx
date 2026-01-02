@@ -36,7 +36,7 @@ exports.handler = async (event) => {
       .get().data().root;
     if (!schoolAdmin.apps.length){
       schoolAdmin.initializeApp({
-        credential: JSON.parse(schoolSecret)
+        credential: schoolAdmin.credential.cert(JSON.parse(schoolSecret))
       })
     }
     const schoolDb = schoolAdmin.firestore();
