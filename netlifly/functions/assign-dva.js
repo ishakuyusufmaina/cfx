@@ -73,7 +73,7 @@ exports.handler = async (event) => {
       "country": "NG",
        split_code: schoolProfile.splitCode,
        "metadata": {
-           studentName: std.stdName,
+           studentName: std.name,
            studentId,
            schoolId,
            "class": std.class,
