@@ -77,10 +77,7 @@ exports.handler = async (event) => {
           "Authorization": `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          customer: customerCode,
-          preferred_bank: preferredBank || "wema-bank",
-        }),
+        body: JSON.stringify(data),
       }
     );
 
