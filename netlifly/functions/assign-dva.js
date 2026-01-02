@@ -23,6 +23,8 @@ exports.handler = async (event) => {
 
     // Verify signature
 
+    const { studentId, schoolId, schoolBatch, term, session } = JSON.parse(event.body);
+
     const requiredFields = { studentId, schoolId, schoolBatch, term, session };
     const missingFields = Object.entries(requiredFields)
        .filter(([_, value]) => !value)
