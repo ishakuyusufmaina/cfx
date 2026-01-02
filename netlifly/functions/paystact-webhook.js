@@ -74,7 +74,7 @@ exports.handler = async (event) => {
         break;
       
       case "charge.success":
-        console.log("Payment successful:", data.reference, JSON.stringify(data));
+     //   console.log("Payment successful:", data.reference, JSON.stringify(data));
         // TODO: update DB, activate subscription, etc.
         const payment = {
           "class": meta.class,
@@ -85,7 +85,7 @@ exports.handler = async (event) => {
           "for": meta.for,
           term: meta.term,
           session: meta.session,
-          amount: Number(data.amount),
+          amount: Number(data.amount)/100,
           schoolId: meta.schoolId,
           studentId: meta.studentId,
           studentName: meta.studentName
@@ -98,9 +98,9 @@ exports.handler = async (event) => {
         if (!admin.apps.some(app=>app.name=="paybook")) {
           admin.initializeApp({
             credential: admin.credential.cert(JSON.parse(pbSecret))
-          });
+          }, "paybook");
         }
-        const pbdb = admin.app("paybook").firetore();
+        const pbdb = admin.app("paybook").firestore();
         await pbdb.collection("payments").add(payment);
         break;
 
