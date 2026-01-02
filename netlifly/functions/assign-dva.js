@@ -63,7 +63,8 @@ exports.handler = async (event) => {
       .doc("db")
       .collection("students")
       .doc(studentId);
-    const std = await stdRef.get().data();
+    const stdDoc = await stdRef.get();
+    const std = stdDoc.data();
     const stdNames = std.name.replace(/\s+/g, ' ').trim().split(" ");
     const data={ 
       "email": `${schoolId}.${studentId}@gmail.com`,
