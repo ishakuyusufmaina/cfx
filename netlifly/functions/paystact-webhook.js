@@ -40,7 +40,7 @@ exports.handler = async (event) => {
 
     const payload = JSON.parse(event.body);
     const { event: eventType, data } = payload;
-    const meta = data.metadata;
+    const meta = data.customer.metadata;
     
     // Handle events
     switch (eventType) {
