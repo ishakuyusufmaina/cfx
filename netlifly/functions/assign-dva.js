@@ -3,7 +3,7 @@ const unityAdmin = require("firebase-admin");
 
 if (!unityAdmin.apps.length) {
   unityAdmin.initializeApp({
-    credential: admin.credential.cert(JSON.parse(process.env.UNITY_CONFIG)),
+    credential: unityAdmin.credential.cert(JSON.parse(process.env.UNITY_CONFIG)),
   });
 }
 const udb = unityAdmin.firestore();
