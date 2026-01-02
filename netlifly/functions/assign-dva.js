@@ -69,7 +69,7 @@ exports.handler = async (event) => {
     const data={ 
       "email": `${schoolId}.${studentId}@gmail.com`,
       "first_name": stdNames[0],
-      "middle_name": stdNames.length==3? stdNames[1] : "",
+      "middle_name": stdNames[1],
       "last_name": stdNames[stdNames.length-1],
       "phone": schoolProfile.phoneNumber,
       "country": "NG",
