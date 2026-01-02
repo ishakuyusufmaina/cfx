@@ -1,12 +1,14 @@
 const crypto = require("crypto");
-const unityAdmin = require("firebase-admin");
+const admin = require("firebase-admin");
 
-if (!unityAdmin.apps.length) {
-  unityAdmin.initializeApp({
-    credential: unityAdmin.credential.cert(JSON.parse(process.env.UNITY_CONFIG)),
-  });
+if (!admin.apps.some(app=>app.name=="unity")) {
+  admin.initializeApp({
+    credential: admin.credential.cert(JSON.parse(process.env.UNITY_CONFIG))
+  },
+  "unity"
+  )  
 }
-const udb = unityAdmin.firestore();
+const udb = admin.app("unity").firestore();
 const secretsCol = udb.collection("secrets");
 
 exports.handler = async (event) => {
@@ -41,16 +43,17 @@ exports.handler = async (event) => {
     }
     
     
-    const schoolAdmin = require("firebase-admin");
     const schoolSecret = await secretsCol
       .doc(schoolBatch)
       .get().data().root;
-    if (!schoolAdmin.apps.length){
+    if (!admin.apps.some(app=>app.name=="school")){
       schoolAdmin.initializeApp({
-        credential: schoolAdmin.credential.cert(JSON.parse(schoolSecret))
-      })
+        credential: admin.credential.cert(JSON.parse(schoolSecret))
+      },
+      "school"
+     )
     }
-    const schoolDb = schoolAdmin.firestore();
+    const schoolDb = admin.app("school").firestore();
     const schoolProfile = await schoolDb
       .collection(schoolId)
       .doc("profile").get().data();
