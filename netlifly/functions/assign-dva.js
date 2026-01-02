@@ -90,7 +90,7 @@ exports.handler = async (event) => {
       {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+          "Authorization": `Bearer ${process.env.MSS_PS}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
