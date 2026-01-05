@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 const admin = require("firebase-admin");
 
-const ALLOWED_ORIGIN = "http://innovative.mainafly.com";
+const ALLOWED_ORIGIN = "https://innovative.mainafly.com";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
