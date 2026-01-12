@@ -53,7 +53,7 @@ async function sendPaymentEmail(payment, email) {
   const mail = paymentEmailTemplate(payment);
 
   await mailer.sendMail({
-    from: `"School Admin" <${process.env.EMAIL_USER}>`,
+    from: `"School Admin maiduguriinnovativeschool2025@gmail.com",
     to: email,
     subject: mail.subject,
     text: mail.text,
@@ -163,7 +163,7 @@ exports.handler = async (event) => {
         await pbdb.collection("payments").add(payment);
 
 
-          if (meta.email) {
+          if (true) {
     sendPaymentEmail(payment, "yusufmainaishaku@gmail.com")
       .catch(err => console.error("Email failed:", err));
           }
