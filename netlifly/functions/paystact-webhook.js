@@ -53,7 +53,7 @@ async function sendPaymentEmail(payment, email) {
   const mail = paymentEmailTemplate(payment);
 
   await mailer.sendMail({
-    from: `"School Admin maiduguriinnovativeschool2025@gmail.com",
+    from: "School Admin maiduguriinnovativeschool2025@gmail.com",
     to: email,
     subject: mail.subject,
     text: mail.text,
