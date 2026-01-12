@@ -1,6 +1,65 @@
 const crypto = require("crypto");
 const admin = require("firebase-admin");
+const nodemailer = require("nodemailer");
+const mailer = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: "maiduguriinnovativeschool2025@gmail.com", //process.env.EMAIL_USER,
+    pass: process.env.mailpass, // Gmail App Password
+  },
+});
 //const admin = require("firebase-admin");
+
+
+function paymentEmailTemplate(payment) {
+  const date = payment.timestamp.toDate();
+  const formattedDate = date.toLocaleString("en-NG", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+
+  return {
+    subject: `Payment Receipt – ${payment.studentName}`,
+    html: `
+      <div style="font-family:Arial; max-width:600px">
+        <h2>Payment Receipt</h2>
+        <p><strong>Student:</strong> ${payment.studentName}</p>
+        <p><strong>Class:</strong> ${payment.class}</p>
+        <p><strong>Term:</strong> ${payment.term}</p>
+        <p><strong>Session:</strong> ${payment.session}</p>
+        <p><strong>Purpose:</strong> ${payment.for}</p>
+        <hr/>
+        <h3>Amount Paid: ₦${payment.amount.toLocaleString()}</h3>
+        <p><strong>Reference:</strong> ${payment.reference}</p>
+        <p><strong>Date:</strong> ${formattedDate}</p>
+        <hr/>
+        <p>Thank you for your payment.</p>
+      </div>
+    `,
+    text: `
+Payment Receipt
+Student: ${payment.studentName}
+Amount: ₦${payment.amount}
+Reference: ${payment.reference}
+Date: ${formattedDate}
+`
+  };
+}
+
+
+async function sendPaymentEmail(payment, email) {
+  const mail = paymentEmailTemplate(payment);
+
+  await mailer.sendMail({
+    from: `"School Admin" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: mail.subject,
+    text: mail.text,
+    html: mail.html,
+  });
+}
 
 // Initialize Unity Firebase once
 if (!admin.apps.some(app=>app.name=="unity")) {
@@ -102,6 +161,13 @@ exports.handler = async (event) => {
         }
         const pbdb = admin.app("paybook").firestore();
         await pbdb.collection("payments").add(payment);
+
+
+          if (meta.email) {
+    sendPaymentEmail(payment, "yusufmainaishaku@gmail.com")
+      .catch(err => console.error("Email failed:", err));
+          }
+        
         break;
 
       case "transfer.success":
