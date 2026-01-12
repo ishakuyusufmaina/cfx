@@ -12,6 +12,7 @@ const mailer = nodemailer.createTransport({
 });
 //const admin = require("firebase-admin");
 
+const terms = ["first term", "second term", "third term"];
 
 function paymentEmailTemplate(payment) {
   const date = payment.timestamp.toDate();
@@ -21,15 +22,15 @@ function paymentEmailTemplate(payment) {
   });
 
   return {
-    subject: `Payment Receipt – ${payment.studentName}`,
+    subject: `Payment Receipt – ${payment.studentName.toUpperCase()}`,
     html: `
       <div style="font-family:Arial; max-width:600px">
         <h2>Payment Receipt</h2>
-        <p><strong>Student:</strong> ${payment.studentName}</p>
-        <p><strong>Class:</strong> ${payment.class}</p>
-        <p><strong>Term:</strong> ${payment.term}</p>
+        <p><strong>Student:</strong> ${payment.studentName.toUpperCase()}</p>
+        <p><strong>Class:</strong> ${payment.class.toUpperCase()}</p>
+        <p><strong>Term:</strong> ${terms[payment.term]}</p>
         <p><strong>Session:</strong> ${payment.session}</p>
-        <p><strong>Purpose:</strong> ${payment.for}</p>
+        <p><strong>Purpose:</strong> ${payment.for.toUpperCase()}</p>
         <hr/>
         <h3>Amount Paid: ₦${payment.amount.toLocaleString()}</h3>
         <p><strong>Reference:</strong> ${payment.reference}</p>
@@ -40,7 +41,7 @@ function paymentEmailTemplate(payment) {
     `,
     text: `
 Payment Receipt
-Student: ${payment.studentName}
+Student: ${payment.studentName.toUpperCase()}
 Amount: ₦${payment.amount}
 Reference: ${payment.reference}
 Date: ${formattedDate}
@@ -53,7 +54,7 @@ async function sendPaymentEmail(payment, email) {
   const mail = paymentEmailTemplate(payment);
 
   await mailer.sendMail({
-    from: "School Admin maiduguriinnovativeschool2025@gmail.com",
+    from: "Fees Collection maiduguriinnovativeschool2025@gmail.com",
     to: email,
     subject: mail.subject,
     text: mail.text,
@@ -164,7 +165,7 @@ exports.handler = async (event) => {
 
 
           if (true) {
-    sendPaymentEmail(payment, "yusufmainaishaku@gmail.com")
+    sendPaymentEmail(payment, "aminatmakintami@gmail.com")
       .catch(err => console.error("Email failed:", err));
           }
         
