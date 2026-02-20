@@ -53,25 +53,27 @@ exports.handler = async (event) => {
           throw new Error("Password is required for user registration");
         }
         result = await admin.app("app").auth().createUser({ email, password });
-        await db.collection("users").doc(email).set({ email, status: "active", createdAt: new Date() });
+        payload.status = "active";
+        payload.createdAt = new Date();
+        await db.collection("users").doc(payload.username).set(payload);
         break;
 
       case "delete":
         await admin.app("app").auth().deleteUserByEmail(email)
           .catch(err => { throw new Error(err.message) });
-        await db.collection("users").doc(email).update({ status: "deleted", deletedAt: new Date() });
+        await db.collection("users").doc(payload.username).update({ status: "deleted", deletedAt: new Date() });
         result = { message: `User ${email} deleted` };
         break;
 
       case "disable":
         await admin.app("app").auth().updateUserByEmail(email, { disabled: true });
-        await db.collection("users").doc(email).update({ status: "disabled", updatedAt: new Date() });
+        await db.collection("users").doc(payload.username).update({ status: "disabled", updatedAt: new Date() });
         result = { message: `User ${email} disabled` };
         break;
 
       case "enable":
         await admin.app("app").auth().updateUserByEmail(email, { disabled: false });
-        await db.collection("users").doc(email).update({ status: "active", updatedAt: new Date() });
+        await db.collection("users").doc(payload.username).update({ status: "active", updatedAt: new Date() });
         result = { message: `User ${email} enabled` };
         break;
 
