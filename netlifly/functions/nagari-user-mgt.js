@@ -47,6 +47,7 @@ exports.handler = async (event) => {
     const db = admin.app("app").firestore();
 
     let result;
+    let userRecord
     switch (operator.toLowerCase()) {
       case "register":
         if (!password) {
@@ -59,7 +60,7 @@ exports.handler = async (event) => {
         break;
 
       case "delete":
-            const userRecord = await admin.app("app").auth().getUserByEmail(email);
+        userRecord = await admin.app("app").auth().getUserByEmail(email);
 
     // Step 2: Delete the user by UID
         await admin.app("app").auth().deleteUser(userRecord.uid)
@@ -69,9 +70,9 @@ exports.handler = async (event) => {
         break;
 
       case "disable":
-        //await admin.app("app").auth().updateUserByEmail(email, { disabled: true });
+        //await admi;n.app("app").auth().updateUserByEmail(email, { disabled: true });
        // Get user by email
-       const userRecord = await admin.auth().getUserByEmail(email);
+        userRecord = await admin.auth().getUserByEmail(email);
     
     // Disable the user
         await admin.auth().updateUser(userRecord.uid, { disabled: true });
@@ -87,11 +88,10 @@ exports.handler = async (event) => {
       case "enable":
        // await admin.app("app").auth().updateUserByEmail(email, { disabled: false });
        // Get user by email
-       const userRecord = await admin.auth().getUserByEmail(email);
+        userRecord = await admin.auth().getUserByEmail(email);
     
     // Disable the user
-       await admin.auth().updateUser(userRecord.uid, { disa
-         bled: false });
+        await admin.auth().updateUser(userRecord.uid, { disabled: false });
         
         await db.collection("users").doc(payload.username).update({ status: "active", updatedAt: new Date() });
         result = { message: `User ${email} enabled` };
