@@ -18,7 +18,7 @@ exports.handler = async (event) => {
     const data = payload;
     const meta = data.context;             // Cloudinary context
     const cloudUrl = data.secure_url || data.url; // Image URL
-
+    console.log("context: ", JSON.stringify(data.context))
     if (!cloudUrl) {
       throw new Error("No Cloudinary URL found in payload.");
     }
