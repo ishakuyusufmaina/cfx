@@ -1,5 +1,5 @@
 const admin = require("firebase-admin");
-
+console.log("Bismillah");
 // Initialize main Unity Firebase app (global)
 if (!admin.apps.some(app => app.name === "unity")) {
   admin.initializeApp({
