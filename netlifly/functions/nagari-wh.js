@@ -14,7 +14,8 @@ exports.handler = async (event) => {
   try {
     // Parse webhook payload
     const payload = JSON.parse(event.body);
-    const { event: eventType, data } = payload;
+   // const { event: eventType, data } = payload;
+    const data = payload;
     const meta = data.context;             // Cloudinary context
     const cloudUrl = data.secure_url || data.url; // Image URL
 
