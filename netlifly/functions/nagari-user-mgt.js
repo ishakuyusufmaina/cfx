@@ -59,8 +59,11 @@ exports.handler = async (event) => {
         break;
 
       case "delete":
-        await admin.app("app").auth().deleteUserByEmail(email)
-          .catch(err => { throw new Error(err.message) });
+            const userRecord = await admin.app("app").auth().getUserByEmail(email);
+
+    // Step 2: Delete the user by UID
+        await admin.app("app").auth().deleteUser(userRecord.uid)
+     //    .catch(err => { throw new Error(err.message) });
         await db.collection("users").doc(payload.username).update({ status: "deleted", deletedAt: new Date() });
         result = { message: `User ${email} deleted` };
         break;
@@ -72,6 +75,11 @@ exports.handler = async (event) => {
     
     // Disable the user
         await admin.auth().updateUser(userRecord.uid, { disabled: true });
+        //  const userRecord = await admin.app("app").auth().getUserByEmail(email);
+
+    // Step 2: Delete the user by UID
+       //await admin.app("app").auth().deleteUser(userRecord.uid);
+        
         await db.collection("users").doc(payload.username).update({ status: "disabled", updatedAt: new Date() });
         result = { message: `User ${email} disabled` };
         break;
@@ -82,7 +90,8 @@ exports.handler = async (event) => {
        const userRecord = await admin.auth().getUserByEmail(email);
     
     // Disable the user
-       await admin.auth().updateUser(userRecord.uid, { disabled: false });
+       await admin.auth().updateUser(userRecord.uid, { disa
+         bled: false });
         
         await db.collection("users").doc(payload.username).update({ status: "active", updatedAt: new Date() });
         result = { message: `User ${email} enabled` };
