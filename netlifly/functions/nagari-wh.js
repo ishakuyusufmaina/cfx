@@ -53,7 +53,7 @@ exports.handler = async (event) => {
 
     // Save to "files" collection
     await db.collection("files").add(fileData);
-
+    console.log("Successfully uploaded");
     return {
       statusCode: 200,
       body: JSON.stringify({ received: true }),
