@@ -66,13 +66,24 @@ exports.handler = async (event) => {
         break;
 
       case "disable":
-        await admin.app("app").auth().updateUserByEmail(email, { disabled: true });
+        //await admin.app("app").auth().updateUserByEmail(email, { disabled: true });
+       // Get user by email
+       const userRecord = await admin.auth().getUserByEmail(email);
+    
+    // Disable the user
+        await admin.auth().updateUser(userRecord.uid, { disabled: true });
         await db.collection("users").doc(payload.username).update({ status: "disabled", updatedAt: new Date() });
         result = { message: `User ${email} disabled` };
         break;
 
       case "enable":
-        await admin.app("app").auth().updateUserByEmail(email, { disabled: false });
+       // await admin.app("app").auth().updateUserByEmail(email, { disabled: false });
+       // Get user by email
+       const userRecord = await admin.auth().getUserByEmail(email);
+    
+    // Disable the user
+       await admin.auth().updateUser(userRecord.uid, { disabled: false });
+        
         await db.collection("users").doc(payload.username).update({ status: "active", updatedAt: new Date() });
         result = { message: `User ${email} enabled` };
         break;
