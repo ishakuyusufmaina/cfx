@@ -16,7 +16,7 @@ exports.handler = async (event) => {
     const payload = JSON.parse(event.body);
    // const { event: eventType, data } = payload;
     const data = payload;
-    const meta = data.context;             // Cloudinary context
+    const meta = data.context.custom;             // Cloudinary context
     const cloudUrl = data.secure_url || data.url; // Image URL
     console.log("context: ", JSON.stringify(data.context))
     if (!cloudUrl) {
