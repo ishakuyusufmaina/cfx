@@ -20,7 +20,7 @@ exports.handler = async (event) => {
     try {
 
         const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
-        const privateKey = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
+        const privateKey = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n').trim();
 
         const now = Math.floor(Date.now() / 1000);
 
