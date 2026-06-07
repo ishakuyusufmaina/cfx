@@ -2,6 +2,11 @@ const jwt = require('jsonwebtoken');
 
 
 exports.handler = async () => {
+      const corsHeaders = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
+    };
     try {
 
         const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
@@ -50,7 +55,12 @@ exports.handler = async () => {
         if (!response.ok) {
             return {
                 statusCode: 500,
-                body: JSON.stringify(data)
+                body: JSON.stringify(data),
+                headers: {
+                     "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                    "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
+                }
             };
         }
 
@@ -58,6 +68,9 @@ exports.handler = async () => {
             statusCode: 200,
             headers: {
                 'Content-Type': 'application/json'
+                 "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
             },
             body: JSON.stringify({
                 access_token: data.access_token,
@@ -71,7 +84,12 @@ exports.handler = async () => {
             statusCode: 500,
             body: JSON.stringify({
                 error: err.message
-            })
+            }),
+             headers: {
+                     "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                    "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
+                }
         };
 
     }
