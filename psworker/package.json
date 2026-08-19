@@ -1,5 +1,5 @@
 {
-  "name": "utme-questions-worker",
+  "name": "psworker",
   "version": "1.0.0",
   "private": true,
   "scripts": {
