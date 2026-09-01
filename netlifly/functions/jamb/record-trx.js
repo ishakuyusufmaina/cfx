@@ -40,7 +40,12 @@ exports.handler = async (event) => {
        ),
       });
     const db = admin.firestore();
-    
+    await db.collection("registered-subjects")
+    .doc(email).set(subjects, {merge:true});
+    await db.collection("transactions")
+    .add({ name, email, reference, subjects, createdAt: new Date()});
 
   }
+
+}
 
