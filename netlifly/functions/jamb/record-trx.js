@@ -39,12 +39,22 @@ exports.handler = async (event) => {
         JSON.parse(FB_CONFIG)
        ),
       });
+    
+    if (!name || !reference || !email || !subjects) {
+      return {
+        statusCode: 400,
+        body: "Incomplete transaction details",
+      };
+    }
+    
     const db = admin.firestore();
     await db.collection("registered-subjects")
     .doc(email).set(subjects, {merge:true});
     await db.collection("transactions")
     .add({ name, email, reference, subjects, createdAt: new Date()});
 
+  } catch(e) {
+    
   }
 
 }
