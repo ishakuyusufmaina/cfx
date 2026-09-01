@@ -33,31 +33,7 @@ exports.handler = async (event) => {
     switch (eventType) {
       case "dedicatedaccount.assign.success":
         const dva = data.dedicated_account;
-       // const schoolAdmin = require("firebase-admin");
-        const schoolSecretRef = secretsCol.doc(meta.schoolBatch);
-        const schoolSecretDoc = await schoolSecretRef.get();
-       const schoolSecret = schoolSecretDoc.data().root;
-        if (!admin.apps.some(app=>app.name=="school")){
-          admin.initializeApp({
-            credential: admin.credential.cert(JSON.parse(schoolSecret))
-          }, "school")
-        }
-        const schoolDb = admin.app("school").firestore();
-        const stdRef = schoolDb
-          .collection(meta.schoolId)
-          .doc("db")
-          .collection("students")
-          .doc(meta.studentId);
-        await stdRef.update({
-          account: {
-            accountNumber: dva.account_number,
-            accountName: dva.account_name,
-            bankName: dva.bank.name,
-            id: dva.id,
-            createdAt: dva.created_at,
-            updatedAt: dva.updated_at            
-          }
-        });
+       
         break;
       
       case "charge.success":
