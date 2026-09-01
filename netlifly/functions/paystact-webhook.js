@@ -1,82 +1,9 @@
 const crypto = require("crypto");
 const admin = require("firebase-admin");
-const nodemailer = require("nodemailer");
-const mailer = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: "maiduguriinnovativeschool2025@gmail.com", //process.env.EMAIL_USER,
-    pass: process.env.mailpass, // Gmail App Password
-  },
-});
-//const admin = require("firebase-admin");
-
-const terms = ["first term", "second term", "third term"];
-
-function paymentEmailTemplate(payment) {
-  const date = payment.timestamp.toDate();
-  const formattedDate = date.toLocaleString("en-NG", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-
-  return {
-    subject: `Payment Receipt – ${payment.studentName.toUpperCase()}`,
-    html: `
-      <div style="font-family:Arial; max-width:600px">
-        <h2>Payment Receipt</h2>
-        <p><strong>Student:</strong> ${payment.studentName.toUpperCase()}</p>
-        <p><strong>Class:</strong> ${payment.class.toUpperCase()}</p>
-        <p><strong>Term:</strong> ${terms[payment.term]}</p>
-        <p><strong>Session:</strong> ${payment.session}</p>
-        <p><strong>Purpose:</strong> ${payment.for.toUpperCase()}</p>
-        <hr/>
-        <h3>Amount Paid: ₦${payment.amount.toLocaleString()}</h3>
-        <p><strong>Reference:</strong> ${payment.reference}</p>
-        <p><strong>Date:</strong> ${formattedDate}</p>
-        <hr/>
-        <p>Thank you for your payment.</p>
-      </div>
-    `,
-    text: `
-Payment Receipt
-Student: ${payment.studentName.toUpperCase()}
-Amount: ₦${payment.amount}
-Reference: ${payment.reference}
-Date: ${formattedDate}
-`
-  };
-}
 
 
-async function sendPaymentEmail(payment, email) {
-  const mail = paymentEmailTemplate(payment);
 
-  await mailer.sendMail({
-    from: "Fees Collection maiduguriinnovativeschool2025@gmail.com",
-    to: email,
-    subject: mail.subject,
-    text: mail.text,
-    html: mail.html,
-  });
-}
 
-// Initialize Unity Firebase once
-if (!admin.apps.some(app=>app.name=="unity")) {
-  admin.initializeApp({
-    credential: admin.credential.cert(JSON.parse(process.env.UNITY_CONFIG)),
-  }, "unity");
-}
-
-const udb = admin.app("unity").firestore();
-const secretsCol = udb.collection("secrets");
-// Initialize Firebase once
-/*if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SIB_CONFIG)),
-  });
-}*/
 
 exports.handler = async (event) => {
   try {
