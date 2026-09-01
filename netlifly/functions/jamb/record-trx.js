@@ -14,13 +14,7 @@ const corsHeaders = {
 exports.handler = async (event) => {
 
   // 🔹 CORS preflight
-  if (event.httpMethod === "OPTIONS") {
-    return {
-      statusCode: 200,
-      headers: corsHeaders,
-      body: "",
-    };
-  }
+  
 
   if (event.httpMethod !== "POST") {
     return {
@@ -31,7 +25,7 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { name, email, reference, subjects } =
+    const { name, email, reference, subjects, FB_CONFIG } =
       JSON.parse(event.body || "{}");
 
       admin.initializeApp({
@@ -53,8 +47,15 @@ exports.handler = async (event) => {
     await db.collection("transactions")
     .add({ name, email, reference, subjects, createdAt: new Date()});
 
+    return {
+      statusCode: 201,
+      body: "ok"
+    }
   } catch(e) {
-    
+    return {
+      statusCode: 500,
+      body: JSON.stringify({"Internal server error: " + e.message})
+    }
   }
 
 }
