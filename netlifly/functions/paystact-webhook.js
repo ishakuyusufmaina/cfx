@@ -1,9 +1,4 @@
 const crypto = require("crypto");
-const admin = require("firebase-admin");
-
-
-
-
 
 exports.handler = async (event) => {
   try {
@@ -37,41 +32,23 @@ exports.handler = async (event) => {
         break;
       
       case "charge.success":
-     //   console.log("Payment successful:", data.reference, JSON.stringify(data));
-        // TODO: update DB, activate subscription, etc.
-        const payment = {
-          "class": meta.class,
-          timestamp: admin.firestore.Timestamp.fromDate(
-             new Date(data.paid_at)
-          ),
-          reference: data.reference,
-          "for": meta.for,
-          term: meta.term,
-          session: meta.session,
-          amount: Number(data.amount)/100,
-          schoolId: meta.schoolId,
-          studentId: meta.studentId,
-          studentName: meta.studentName
-          
-        }
-        const pbSecretRef = secretsCol.doc("paymentbook");
-        const pbSecretDoc = await pbSecretRef.get();
-        const pbSecret = pbSecretDoc.data().root;
-        const pbAdmin = require("firebase-admin");
-        if (!admin.apps.some(app=>app.name=="paybook")) {
-          admin.initializeApp({
-            credential: admin.credential.cert(JSON.parse(pbSecret))
-          }, "paybook");
-        }
-        const pbdb = admin.app("paybook").firestore();
-        await pbdb.collection("payments").add(payment);
-
-
-          if (true) {
-    sendPaymentEmail(payment, "aminatmakintami@gmail.com")
-      .catch(err => console.error("Email failed:", err));
-          }
-        
+         if (meta.customerType==="jamb"){
+           const jambPayment = {
+             name: meta.name,
+             email: meta.email,
+             reference: data.reference,
+             PS_SECRET: secret,
+             subjects: JSON.parse(meta.subjects)
+           };
+           const response = await fetch("https://jamb-affirm.yusufmainaishaku.workers.dev", {
+             method: "POST",
+             headers: {"Content-Type": "application/json"},
+             body: JSON.stringify(jambPayment)
+           });
+           
+           if (response.status !== 202) return { statusCode: 500, body: "Payment affirmation request failed" };
+           
+         }
         break;
 
       case "transfer.success":
@@ -91,3 +68,4 @@ exports.handler = async (event) => {
     return { statusCode: 500, body: "Server Error" };
   }
 };
+
