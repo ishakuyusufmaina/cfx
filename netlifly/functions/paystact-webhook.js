@@ -22,7 +22,7 @@ exports.handler = async (event) => {
 
     const payload = JSON.parse(event.body);
     const { event: eventType, data } = payload;
-    const meta = data?.customer?.metadata || {};
+    const meta = data.metadata || {};
     console.log(JSON.stringify(data));
     // Handle events
     switch (eventType) {
@@ -33,7 +33,7 @@ exports.handler = async (event) => {
       
       case "charge.success":
          if (meta.customerType==="jamb"){
-           const meta = data.customer.metadata;
+        //   const meta = data.customer.metadata;
            const jambPayment = {
              name: meta.name,
              email: meta.email,
