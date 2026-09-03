@@ -22,7 +22,7 @@ exports.handler = async (event) => {
 
     const payload = JSON.parse(event.body);
     const { event: eventType, data } = payload;
-    const meta = data.customer.metadata;
+    
     
     // Handle events
     switch (eventType) {
@@ -33,13 +33,15 @@ exports.handler = async (event) => {
       
       case "charge.success":
          if (meta.customerType==="jamb"){
+           const meta = data.customer.metadata;
            const jambPayment = {
              name: meta.name,
              email: meta.email,
              reference: data.reference,
              PS_SECRET: secret,
-             subjects: JSON.parse(meta.subjects)
+             subjects: Jmeta.subjects
            };
+           console.log(jambPayment);
            const response = await fetch("https://jamb-affirm.yusufmainaishaku.workers.dev", {
              method: "POST",
              headers: {"Content-Type": "application/json"},
