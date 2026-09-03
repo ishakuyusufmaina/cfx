@@ -39,7 +39,7 @@ exports.handler = async (event) => {
              email: meta.email,
              reference: data.reference,
              PS_SECRET: secret,
-             subjects: Jmeta.subjects
+             subjects: meta.subjects
            };
            console.log(jambPayment);
            const response = await fetch("https://jamb-affirm.yusufmainaishaku.workers.dev", {
