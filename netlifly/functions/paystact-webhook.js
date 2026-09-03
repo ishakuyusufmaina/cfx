@@ -47,7 +47,7 @@ exports.handler = async (event) => {
            });
            
            if (response.status !== 202) return { statusCode: 500, body: "Payment affirmation request failed" };
-           
+           console.log("JAMB Payment received and affirmed: "+ JSON.stringify(jambPayment));
          }
         break;
 
