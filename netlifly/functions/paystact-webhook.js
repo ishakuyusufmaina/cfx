@@ -22,8 +22,8 @@ exports.handler = async (event) => {
 
     const payload = JSON.parse(event.body);
     const { event: eventType, data } = payload;
-    
-    
+    const meta = data?.customer?.metadata || {};
+    console.log(JSON.stringify(data));
     // Handle events
     switch (eventType) {
       case "dedicatedaccount.assign.success":
