@@ -28,6 +28,8 @@ exports.handler = async (event) => {
     const { name, email, reference, subjects, FB_CONFIG } =
       JSON.parse(event.body || "{}");
 
+    console.log({ name, email, reference, subjects, FB_CONFIG });
+    
       if (!admin.apps.length) admin.initializeApp({
         credential: admin.credential.cert(
         FB_CONFIG
