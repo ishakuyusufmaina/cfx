@@ -32,7 +32,7 @@ exports.handler = async (event) => {
     
       if (!admin.apps.length) admin.initializeApp({
         credential: admin.credential.cert(
-        FB_CONFIG
+        JSON.parse(FB_CONFIG)
        ),
       });
     
