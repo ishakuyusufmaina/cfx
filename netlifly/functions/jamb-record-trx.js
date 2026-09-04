@@ -47,7 +47,7 @@ exports.handler = async (event) => {
     await db.collection("registered-subjects")
     .doc(email).set(subjects, {merge:true});
     await db.collection("transactions")
-    .add({ name, email, reference, subjects, createdAt: new Date()});
+    .add({ name, email, reference, subjects, createdAt: admin.firestore.FieldValue.serverTimestamp()});
 
     return {
       statusCode: 201,
