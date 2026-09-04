@@ -45,8 +45,11 @@ exports.handler = async (event) => {
     
     const db = admin.firestore();
     console.log("before commit");
+    const subjectObj = {};
+    //conversion to firestore document
+    subjects.forEach(subject => subjectObj[subject.id] = subject);
     await db.collection("registered-subjects")
-    .doc(email).set(subjects, {merge:true});
+    .doc(email).set(subjectObj, {merge:true});
     await db.collection("transactions")
     .add({ name, email, reference, subjects, createdAt: admin.firestore.FieldValue.serverTimestamp()});
 
