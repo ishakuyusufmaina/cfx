@@ -39,7 +39,7 @@ exports.handler = async (event) => {
     if (!name || !reference || !email || !subjects) {
       return {
         statusCode: 400,
-        body: "Incomplete transaction details",
+        body: JSON.stringify({message:"Incomplete transaction details", error: "incomplete payload"})
       };
     }
     
