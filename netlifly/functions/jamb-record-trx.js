@@ -28,7 +28,7 @@ exports.handler = async (event) => {
     const { name, email, reference, subjects, FB_CONFIG } =
       JSON.parse(event.body || "{}");
 
-      admin.initializeApp({
+      if (!admin.apps.length) admin.initializeApp({
         credential: admin.credential.cert(
         FB_CONFIG
        ),
@@ -54,8 +54,9 @@ exports.handler = async (event) => {
   } catch(e) {
     return {
       statusCode: 500,
-      body: JSON.stringify({"Internal server error: " + e.message})
+      body: JSON.stringify({message: "Internal server error: ", "error": e.message})
     }
+    
   }
 
 }
