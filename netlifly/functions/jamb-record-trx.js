@@ -44,6 +44,7 @@ exports.handler = async (event) => {
     }
     
     const db = admin.firestore();
+    console.log("before commit");
     await db.collection("registered-subjects")
     .doc(email).set(subjects, {merge:true});
     await db.collection("transactions")
